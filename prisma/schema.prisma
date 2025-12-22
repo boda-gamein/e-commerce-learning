@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum RoleName {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  pending
+  ARRIVED
+  DELEVIERD
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  roleId String @db.Uuid @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  orders Order[]
+
+  @@map("users")
+}
+
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      RoleName @default(CUSTOMER) @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("roles")
+}
+
+model Product {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String
+  price         Float
+  stockQuantity Int      @map("stock_quantity")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  categoryId String   @db.Uuid @map("category_id")
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+model Category {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  // If your real table name is misspelled as "categoury", keep this:
+  @@map("categoury")
+  // If your real table name is actually "category", replace with:
+  // @@map("category")
+}
+
+model OrderItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  itemPrice Float    @default(0) @map("item_price")
+  quantity  Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  productId String  @db.Uuid @map("product_id")
+  product   Product @relation(fields: [productId], references: [id])
+
+  orderId String @db.Uuid @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  @@map("order_items")
+}
+
+model Order {
+  id          String      @id @default(uuid()) @db.Uuid
+  totalAmount Float?      @map("total_amount")
+  status      OrderStatus @default(pending)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  userId String @db.Uuid @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  items OrderItem[]
+
+  @@map("orders")
+}
