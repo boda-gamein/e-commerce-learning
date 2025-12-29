@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, RoleName, OrderStatus } from "@prisma/client"
+import { PrismaClient, Prisma, RoleName, OrderStatus ,Category, Product } from "@prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 
 const adapter = new PrismaPg({
@@ -61,12 +61,7 @@ async function seed() {
     // If you can, add `@unique` to Category.name and then use upsert like Role.
     const categoryNames = ["Electronics", "Books", "Clothing"]
 
-    const categories: {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        name: string;
-    }[] | null = []
+    const categories: Category[] | null = []
     for (const name of categoryNames) {
         const existing = await prisma.category.findFirst({ where: { name } })
         const category =
@@ -93,15 +88,7 @@ async function seed() {
             { name: "Novel", price: 15, stockQuantity: 100, categoryId: books.id },
         ]
 
-    const products: {
-        id: string;
-        name: string;
-        createdAt: Date;
-        updatedAt: Date;
-        price: number;
-        stockQuantity: number;
-        categoryId: string;
-    }[] = []
+    const products: Product[] = []
     for (const p of productsData) {
         const existing = await prisma.product.findFirst({
             where: { name: p.name, categoryId: p.categoryId },
