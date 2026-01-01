@@ -12,7 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum RoleName {
   CUSTOMER
   ADMIN
@@ -25,13 +24,15 @@ enum OrderStatus {
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String   @unique
+  password   String
+  first_name String
+  last_name  String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  roleId String @db.Uuid @map("role_id")
+  roleId String @map("role_id") @db.Uuid
   role   Role   @relation(fields: [roleId], references: [id])
 
   orders Order[]
@@ -41,7 +42,7 @@ model User {
 
 model Role {
   id        String   @id @default(uuid()) @db.Uuid
-  name      RoleName @default(CUSTOMER) @unique
+  name      RoleName @unique @default(CUSTOMER)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -58,7 +59,7 @@ model Product {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  categoryId String   @db.Uuid @map("category_id")
+  categoryId String   @map("category_id") @db.Uuid
   category   Category @relation(fields: [categoryId], references: [id])
 
   orderItems OrderItem[]
@@ -73,11 +74,11 @@ model Category {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   products Product[]
+  // If your real table name is actually "category", replace with:
+  // @@map("category")
 
   // If your real table name is misspelled as "categoury", keep this:
   @@map("categoury")
-  // If your real table name is actually "category", replace with:
-  // @@map("category")
 }
 
 model OrderItem {
@@ -87,10 +88,10 @@ model OrderItem {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  productId String  @db.Uuid @map("product_id")
+  productId String  @map("product_id") @db.Uuid
   product   Product @relation(fields: [productId], references: [id])
 
-  orderId String @db.Uuid @map("order_id")
+  orderId String @map("order_id") @db.Uuid
   order   Order  @relation(fields: [orderId], references: [id])
 
   @@map("order_items")
@@ -103,7 +104,7 @@ model Order {
   createdAt   DateTime    @default(now()) @map("created_at")
   updatedAt   DateTime    @updatedAt @map("updated_at")
 
-  userId String @db.Uuid @map("user_id")
+  userId String @map("user_id") @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
 
   items OrderItem[]

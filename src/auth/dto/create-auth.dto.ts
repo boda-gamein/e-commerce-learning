@@ -1,19 +1,69 @@
 // create-auth.dto.ts
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 
 export class RegisterDto {
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'User email address',
+  })
   @IsEmail()
   email: string;
 
+  @ApiProperty({
+    example: 'StrongP@ssw0rd',
+    description:
+      'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character',
+    minLength: 8,
+  })
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+    {
+      message:
+        'Password must include uppercase, lowercase, number, and special character',
+    },
+  )
   password: string;
+
+  @ApiProperty({
+    example: 'Ahmed',
+    description: 'User first name',
+  })
+  @IsString()
+  @IsNotEmpty()
+  first_name: string;
+
+  @ApiProperty({
+    example: 'Hassan',
+    description: 'User last name',
+  })
+  @IsString()
+  @IsNotEmpty()
+  last_name: string;
 }
 
 export class LoginDto {
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Registered user email',
+  })
   @IsEmail()
   email: string;
 
+  @ApiProperty({
+    example: 'StrongP@ssw0rd',
+    description: 'User password',
+  })
   @IsString()
-  password: string;
+  @MinLength(8)
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+    {
+      message:
+        'Password must include uppercase, lowercase, number, and special character',
+    },
+  )
+  password: string
 }

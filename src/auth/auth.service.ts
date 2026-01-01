@@ -9,10 +9,10 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
-    const { email, password } = registerDto;
+    const { email, password, first_name, last_name } = registerDto;
 
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new BadRequestException('Email already in use');
@@ -27,6 +27,8 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email,
+        first_name,
+        last_name,
         password: hashed,
         roleId: customerRole.id,
       },
@@ -68,7 +70,7 @@ export class AuthService {
       sub: userId,
       email,
       role,
-    });
+    }, { expiresIn: "2d" });
   }
 
   private safeUser(user: any) {

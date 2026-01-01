@@ -40,6 +40,8 @@ async function seed() {
         },
         create: {
             email: "admin@example.com",
+            first_name:"admin",
+            last_name: "admin_last_name",
             password: "admin123", // NOTE: hash in real apps
             roleId: adminRole.id,
         },
@@ -52,6 +54,8 @@ async function seed() {
         },
         create: {
             email: "customer@example.com",
+            first_name: "customer",
+            last_name: "customer_last_name",
             password: "customer123", // NOTE: hash in real apps
             roleId: customerRole.id,
         },
