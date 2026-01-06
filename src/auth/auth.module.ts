@@ -6,13 +6,19 @@ import { JwtStrategy } from './jwt.strategy';
 import { UsersController } from 'src/users/users.controller';
 import { AuthController } from './auth.controller';
 import { UsersService } from 'src/users/users.service';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [JwtModule.register({
-    secret: process.env.JWT_SECRET || 'dev_secret_change_me',
-    signOptions: { expiresIn: '1h' },
-  }),],
-  controllers: [AuthController , UsersController],
-  providers: [AuthService, PrismaService, JwtStrategy , UsersService],
+  imports: [JwtModule.registerAsync(
+    {
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>("JWT_SECRET"),
+        signOptions: { expiresIn: "15d" }
+      })
+    }
+  ),],
+  controllers: [AuthController, UsersController],
+  providers: [AuthService, PrismaService, JwtStrategy, UsersService],
 })
 export class AuthModule { }
